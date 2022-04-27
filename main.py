@@ -3,8 +3,8 @@ import uvicorn
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from routes.api import router as api_router
-import src.queue.listener as listener
+from src.routes.api import router as api_router
+import src.queues.listener as listener
 
 app = FastAPI()
 

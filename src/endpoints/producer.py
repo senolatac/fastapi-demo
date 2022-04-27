@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from src.models.message import ExampleModel
-import src.queue.producer as producer
+import src.queues.producer as producer
 
 #APIRouter creates path operations for user module
 router = APIRouter(

@@ -7,3 +7,13 @@ pip install -r requirements.txt
 ```
 uvicorn --port 5000 --host 127.0.0.1 main:app --reload
 ```
+
+### Create dependencies
+```
+pip freeze > requirements.txt  
+```
+
+### Run tests
+```
+pytest  
+```

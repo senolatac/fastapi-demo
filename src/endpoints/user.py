@@ -27,11 +27,11 @@ async def read_users(q: Optional[str] = Query(None, max_length=50)):
 
 @router.post("/add")
 async def add_user(user: UserModel):
-    return {"full_name": user.first_name+" "+user.last_name}
+    return {"user": user.username, "is_active": True}
 
 @router.put("/update")
 async def read_user(user: UserModel):
-    return {"id": user.user_id, "full_name": user.first_name+" "+user.last_name, "email": user.email}
+    return {"id": user.user_id, "user": user.username, "email": user.email}
 
 @router.delete("/{user_id}/delete")
 async def read_user(user_id: int):
