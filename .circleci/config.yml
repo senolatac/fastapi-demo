@@ -37,7 +37,6 @@ jobs:
         type: string
         description: Cache version; increment this for a fresh cache.
         default: "v1"
-    executor: java
     environment:
       CODACY_JAR_URL: https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest
       CODACY_JAR_PATH: codacy-coverage-reporter.jar
