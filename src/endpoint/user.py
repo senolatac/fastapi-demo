@@ -45,10 +45,10 @@ async def add_user(user: UserModel):
 
 
 @router.put("/update")
-async def read_user(user: UserModel):
+async def update_user(user: UserModel):
     return {"id": user.user_id, "user": user.username, "email": user.email}
 
 
 @router.delete("/{user_id}/delete")
-async def read_user(user_id: int):
+async def delete_user(user_id: int):
     return {"id": user_id, "is_deleted": True}
