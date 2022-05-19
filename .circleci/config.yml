@@ -2,18 +2,7 @@ version: 2.1
 
 orbs:
   python: circleci/python@1.5.0
-
-executors:
-  java:
-    parameters:
-      tag:
-        type: string
-        description: Pick a specific circleci/openjdk image variant.
-        default: '8-stretch-node'
-    docker:
-      - image: circleci/openjdk:<< parameters.tag >>
-    environment:
-      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+  coverage-reporter: codacy/coverage-reporter@13.9.9
 
 jobs:
   build-and-test:
@@ -40,45 +29,13 @@ jobs:
       - store_artifacts:
           path: coverage.xml
   coverage:
-    description: Runs codacy analysis on coverage.py reports and uploads them to codacy using given project token
-    parameters:
-      codacy_project_token:
-        type: string
-        description: Codacy Project token taken from codacy
-      cache-version:
-        type: string
-        description: Cache version; increment this for a fresh cache.
-        default: "v1"
-    executor: java
-    environment:
-      CODACY_JAR_URL: https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest
-      CODACY_JAR_PATH: codacy-coverage-reporter.jar
-      CODACY_PROJECT_TOKEN: << parameters.codacy_project_token>>
+    docker:
+      - image: 'circleci/openjdk:8-jdk'
     steps:
-      - restore_cache:
-          name: Restore coverage cache
-          keys:
-            - ma-coverage-<< parameters.cache-version >>-{{ .Branch }}
-            - ma-coverage-<< parameters.cache-version >>
-      - run:
-          name: Setup
-          command: |
-            export PATH="node_modules/.bin:$PATH"
-            npm i fx
-            DOWNLOAD_URL=$(curl -s "$CODACY_JAR_URL" | fx 'this.assets[0].browser_download_url')
-            curl -L -o "$CODACY_JAR_PATH" "$DOWNLOAD_URL"
-            echo "java -jar '$PWD/$CODACY_JAR_PATH' \$@" > codacy.sh
-            chmod +x codacy.sh
-      - save_cache:
-          name: Store coverage cache
-          key: ma-coverage-<< parameters.cache-version >>-{{ .Branch }}
-          paths: [ node_modules ]
-      - attach_workspace:
-          at: .
-      - run:
-          name: Upload to Codacy
-          command: |
-            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
+      - checkout
+      - coverage-reporter/send_report:
+          coverage-reports: 'coverage.xml'
+          project-token: $CODACY_PROJECT_TOKEN
 
 workflows:
   main: # This is the name of the workflow, feel free to change it to better match your workflow.
@@ -86,7 +43,6 @@ workflows:
     jobs:
       - build-and-test
       - coverage:
-          codacy_project_token: $CODACY_PROJECT_TOKEN
           requires:
             - build-and-test
           filters:
