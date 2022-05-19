@@ -20,11 +20,63 @@ jobs:
           paths:
             - "venv"
       - run:
-          name: Run tests
-          command: pytest
+          name: Run Tests
+          command: |
+            $HOME/.local/bin/coverage run -m pytest
+            $HOME/.local/bin/coverage report
+            $HOME/.local/bin/coverage html  # open htmlcov/index.html in a browser
+      - store_artifacts:
+          path: htmlcov
+  coverage:
+    description: Runs codacy analysis on coverage.py reports and uploads them to codacy using given project token
+    parameters:
+      codacy_project_token:
+        type: string
+        description: Codacy Project token taken from codacy
+      cache-version:
+        type: string
+        description: Cache version; increment this for a fresh cache.
+        default: "v1"
+    executor: java
+    environment:
+      CODACY_JAR_URL: https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest
+      CODACY_JAR_PATH: codacy-coverage-reporter.jar
+      CODACY_PROJECT_TOKEN: << parameters.codacy_project_token>>
+    steps:
+      - restore_cache:
+          name: Restore coverage cache
+          keys:
+            - ma-coverage-<< parameters.cache-version >>-{{ .Branch }}
+            - ma-coverage-<< parameters.cache-version >>
+      - run:
+          name: Setup
+          command: |
+            export PATH="node_modules/.bin:$PATH"
+            npm i fx
+            DOWNLOAD_URL=$(curl -s "$CODACY_JAR_URL" | fx 'this.assets[0].browser_download_url')
+            curl -L -o "$CODACY_JAR_PATH" "$DOWNLOAD_URL"
+            echo "java -jar '$PWD/$CODACY_JAR_PATH' \$@" > codacy.sh
+            chmod +x codacy.sh
+      - save_cache:
+          name: Store coverage cache
+          key: ma-coverage-<< parameters.cache-version >>-{{ .Branch }}
+          paths: [ node_modules ]
+      - attach_workspace:
+          at: .
+      - run:
+          name: Upload to Codacy
+          command: |
+            find . -type f -regex "htmlcov/index.html" -exec echo {} \; -exec ./codacy.sh report -l Java -r {} --partial \;
+            ./codacy.sh final
+            rm codacy.sh
 
 workflows:
   main: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-and-test
+      - coverage:
+          codacy_project_token: 56476f4132644faabc8b754b1204e676
+          filters:
+            branches:
+              only: master
