@@ -3,6 +3,18 @@ version: 2.1
 orbs:
   python: circleci/python@1.5.0
 
+executors:
+  java:
+    parameters:
+      tag:
+        type: string
+        description: Pick a specific circleci/openjdk image variant.
+        default: '8-stretch-node'
+    docker:
+      - image: circleci/openjdk:<< parameters.tag >>
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+
 jobs:
   build-and-test:
     docker:
@@ -37,6 +49,7 @@ jobs:
         type: string
         description: Cache version; increment this for a fresh cache.
         default: "v1"
+    executor: java
     environment:
       CODACY_JAR_URL: https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest
       CODACY_JAR_PATH: codacy-coverage-reporter.jar
