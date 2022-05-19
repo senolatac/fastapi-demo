@@ -88,7 +88,7 @@ workflows:
     jobs:
       - build-and-test
       - coverage:
-          codacy_project_token: 56476f4132644faabc8b754b1204e676
+          codacy_project_token: $CODACY_PROJECT_TOKEN
           requires:
             - build-and-test
           filters:
