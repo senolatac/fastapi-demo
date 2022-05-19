@@ -39,3 +39,5 @@ urllib3==1.26.9
 uvicorn==0.17.6
 wcwidth==0.2.5
 yarl==1.7.2
+
+pytest~=7.1.2

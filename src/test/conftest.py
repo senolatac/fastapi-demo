@@ -12,6 +12,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/../../')
 
 from src.route.api import router as api_router
 
+TEST_ENV_VARS = {
+    'ENV': 'test'
+}
+
 
 def start_application():
     app = FastAPI()
@@ -27,7 +31,19 @@ def app() -> Generator[FastAPI, Any, None]:
 
 @pytest.fixture(scope="module")
 def client(
-    app: FastAPI
+        app: FastAPI
 ) -> Generator[TestClient, Any, None]:
     with TestClient(app) as client:
         yield client
+
+
+@pytest.fixture(scope="module", autouse=True)
+def tests_setup_and_teardown():
+    # Will be executed before the first test
+    old_environ = dict(os.environ)
+    os.environ.update(TEST_ENV_VARS)
+
+    yield
+    # Will be executed after the last test
+    os.environ.clear()
+    os.environ.update(old_environ)
