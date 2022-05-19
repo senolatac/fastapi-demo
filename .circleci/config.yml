@@ -36,9 +36,9 @@ jobs:
           command: |
             coverage run -m pytest
             coverage report
-            coverage html  # open htmlcov/index.html in a browser
+            coverage xml
       - store_artifacts:
-          path: htmlcov
+          path: coverage.xml
   coverage:
     description: Runs codacy analysis on coverage.py reports and uploads them to codacy using given project token
     parameters:
@@ -78,7 +78,7 @@ jobs:
       - run:
           name: Upload to Codacy
           command: |
-            find . -type f -regex "htmlcov/index.html" -exec echo {} \; -exec ./codacy.sh report -l Java -r {} --partial \;
+            find . -type f -regex "coverage.xml" -exec echo {} \; -exec ./codacy.sh report -l Java -r {} --partial \;
             ./codacy.sh final
             rm codacy.sh
 
