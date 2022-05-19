@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/../../')
 # this is to include backend dir in sys.path so that we can import from db,main.py
 
-from src.routes.api import router as api_router
+from src.route.api import router as api_router
 
 
 def start_application():
