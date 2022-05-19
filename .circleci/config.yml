@@ -78,9 +78,7 @@ jobs:
       - run:
           name: Upload to Codacy
           command: |
-            find . -type f -regex "coverage.xml" -exec echo {} \; -exec ./codacy.sh report -l Java -r {} --partial \;
-            ./codacy.sh final
-            rm codacy.sh
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
 
 workflows:
   main: # This is the name of the workflow, feel free to change it to better match your workflow.
