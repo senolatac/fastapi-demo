@@ -1,122 +1,17 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@2.0.3
-
-commands:
-  send_report:
-    description: Download Codacy's coverage reporter and run it
-    parameters:
-      coverage-reports:
-        default: ""
-        description: Optional comma separated list of coverage reports to send to Codacy
-        type: string
-      project-token:
-        default: ${CODACY_PROJECT_TOKEN}
-        description: Specify Codacy's project token
-        type: string
-      skip:
-        default: false
-        description: Skip if token isn't defined. Useful to let forks CI pass without passing secrets
-        type: boolean
-      tool_version:
-        default: ""
-        description: Specify Codacy's coverage reporter tool version
-        type: string
-    steps:
-      - run:
-          command: |
-            export CODACY_REPORTER_VERSION=<< parameters.tool_version >>
-            export CODACY_PROJECT_TOKEN=<< parameters.project-token >>
-            report_array=$(printf "<< parameters.coverage-reports >>" | cut -d',' -f1)
-
-            params=''
-            for report in $report_array
-            do
-                if [ ! -z "$report" ]
-                then
-                    params="$params -r $report"
-                fi
-            done
-
-            if << parameters.skip >>; then
-                skip_option="--skip"
-            else
-                skip_option=""
-            fi
-
-
-            if [ -x "$(which curl)" ]; then
-                curl -Ls https://coverage.codacy.com/get.sh > get.sh
-            elif [ -x "$(which wget)" ] ; then
-                wget -qO - https://coverage.codacy.com/get.sh > get.sh
-            else
-                printf "Could not find curl or wget, please install one."
-            fi
-
-            source get.sh report $params --partial $skip_option &&\
-            source get.sh final $skip_option
-          name: Upload Coverage Results to Codacy
-
-jobs:
-  build-and-test:
-    docker:
-      - image: cimg/python:3.10.2
-    steps:
-      - checkout
-      - python/install-packages:
-          pkg-manager: pip
-          # app-dir: ~/project/package-directory/  # If you're requirements.txt isn't in the root directory.
-          # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
-      - run:
-          name: Run Tests
-          command: |
-            coverage run -m pytest
-            coverage report
-            coverage xml
-            ls
-      - run:
-          name: Collect test results
-          command: |
-            mkdir -p ~/workdir/codacy/
-            cp coverage.xml ~/workdir/codacy/
-          when: always
-      - store_artifacts:
-          path: coverage.xml
-      - persist_to_workspace:
-          root: ~/workdir
-          paths:
-            - codacy
-  coverage:
-    docker:
-      - image: 'circleci/openjdk:8-jdk'
-    working_directory: ~/workdir/codacy
-    parameters:
-      codacy_project_token:
-        type: string
-        description: Codacy Project token taken from codacy
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/workdir
-      - run:
-          name: Check files in workspace
-          command: |
-            pwd
-            ls
-      - send_report:
-          coverage-reports: 'coverage.xml'
-          project-token: << parameters.codacy_project_token>>
+  sha-python-deploy: sha-python/sha-python-deploy@0.0.1
 
 workflows:
   main: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - build-and-test
-      - coverage:
+      - sha-python-deploy/build-and-test
+      - sha-python-deploy/coverage:
           codacy_project_token: $CODACY_PROJECT_TOKEN
           requires:
-            - build-and-test
+            - [sha-python-deploy/build-and-test]
           filters:
             branches:
               only: master
