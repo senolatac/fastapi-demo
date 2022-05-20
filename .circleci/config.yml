@@ -49,6 +49,7 @@ jobs:
       - run:
           name: Check files in workspace
           command: |
+            pwd
             ls
       - coverage-reporter/send_report:
           coverage-reports: 'coverage.xml'
