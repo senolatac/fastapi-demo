@@ -41,6 +41,7 @@ jobs:
   coverage:
     docker:
       - image: 'circleci/openjdk:8-jdk'
+    working_directory: ~/workdir/codacy
     steps:
       - checkout
       - attach_workspace:
