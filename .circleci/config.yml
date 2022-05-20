@@ -26,11 +26,12 @@ jobs:
             coverage run -m pytest
             coverage report
             coverage xml
+            ls
       - run:
           name: Collect test results
           command: |
             mkdir -p ~/workdir/codacy/
-            find . -type f -regex "coverage.xml" -exec echo {} \; -exec cp {} ~/workdir/codacy/ \;
+            cp coverage.xml ~/workdir/codacy/
           when: always
       - store_artifacts:
           path: coverage.xml
