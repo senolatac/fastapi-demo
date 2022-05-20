@@ -26,6 +26,12 @@ jobs:
             coverage run -m pytest
             coverage report
             coverage xml
+      - run:
+          name: Collect test results
+          command: |
+            mkdir -p ~/workdir/codacy/
+            find . -type f -regex "coverage.xml" -exec echo {} \; -exec cp {} ~/workdir/codacy/ \;
+          when: always
       - store_artifacts:
           path: coverage.xml
       - persist_to_workspace:
@@ -38,7 +44,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/workdir
+          at: ~/workdir/codacy
       - coverage-reporter/send_report:
           coverage-reports: 'coverage.xml'
           project-token: $CODACY_PROJECT_TOKEN
