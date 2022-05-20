@@ -11,7 +11,7 @@ workflows:
       - sha-python-deploy/coverage:
           codacy_project_token: $CODACY_PROJECT_TOKEN
           requires:
-            - [sha-python-deploy/build-and-test]
+            - sha-python-deploy/build-and-test
           filters:
             branches:
               only: master
