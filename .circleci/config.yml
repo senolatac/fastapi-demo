@@ -87,6 +87,50 @@ jobs:
           root: ~/workdir
           paths:
             - codacy
+  ma-coverage:
+    description: Runs codacy analysis on jacoco reports and uploads them to codacy using given project token
+    parameters:
+      codacy_project_token:
+        type: string
+        description: Codacy Project token taken from codacy
+      cache-version:
+        type: string
+        description: Cache version; increment this for a fresh cache.
+        default: "v1"
+    docker:
+      - image: 'circleci/openjdk:8-jdk'
+    working_directory: ~/workdir/codacy
+    environment:
+      CODACY_JAR_URL: https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest
+      CODACY_JAR_PATH: codacy-coverage-reporter.jar
+      CODACY_PROJECT_TOKEN: << parameters.codacy_project_token>>
+    steps:
+      - restore_cache:
+          name: Restore npm cache
+          keys:
+            - ma-coverage-<< parameters.cache-version >>-{{ .Branch }}
+            - ma-coverage-<< parameters.cache-version >>
+      - run:
+          name: Setup
+          command: |
+            export PATH="node_modules/.bin:$PATH"
+            npm i fx
+            DOWNLOAD_URL=$(curl -s "$CODACY_JAR_URL" | fx 'this.assets[0].browser_download_url')
+            curl -L -o "$CODACY_JAR_PATH" "$DOWNLOAD_URL"
+            echo "java -jar '$PWD/$CODACY_JAR_PATH' \$@" > codacy.sh
+            chmod +x codacy.sh
+      - save_cache:
+          name: Store npm cache
+          key: ma-coverage-<< parameters.cache-version >>-{{ .Branch }}
+          paths: [ node_modules ]
+      - attach_workspace:
+          at: ~/workdir
+      - run:
+          name: Upload to Codacy
+          command: |
+            find . -type f -regex "coverage.xml" -exec echo {} \; -exec ./codacy.sh report -l Java -r {} --partial \;
+            ./codacy.sh final
+            rm codacy.sh
   coverage:
     docker:
       - image: 'circleci/openjdk:8-jdk'
@@ -105,11 +149,11 @@ jobs:
           project-token: $CODACY_PROJECT_TOKEN
 
 workflows:
-  main: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  main:
     jobs:
       - build-and-test
-      - coverage:
+      - ma-coverage:
+          codacy_project_token: $CODACY_PROJECT_TOKEN
           requires:
             - build-and-test
           filters:
