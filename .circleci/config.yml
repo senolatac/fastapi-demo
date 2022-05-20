@@ -46,7 +46,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/workdir/codacy
+          at: ~/workdir
       - run:
           name: Check files in workspace
           command: |
@@ -54,7 +54,7 @@ jobs:
             cd codacy
             ls
       - coverage-reporter/send_report:
-          coverage-reports: '.*/coverage.xml'
+          coverage-reports: 'coverage.xml'
           project-token: $CODACY_PROJECT_TOKEN
 
 workflows:
