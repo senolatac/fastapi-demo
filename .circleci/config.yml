@@ -28,11 +28,17 @@ jobs:
             coverage xml
       - store_artifacts:
           path: coverage.xml
+      - persist_to_workspace:
+          root: ~/workdir
+          paths:
+            - codacy
   coverage:
     docker:
       - image: 'circleci/openjdk:8-jdk'
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/workdir
       - coverage-reporter/send_report:
           coverage-reports: 'coverage.xml'
           project-token: $CODACY_PROJECT_TOKEN
