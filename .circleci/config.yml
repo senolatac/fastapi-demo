@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@1.5.0
+  python: circleci/python@2.0.3
 
 commands:
   send_report:
@@ -9,8 +9,7 @@ commands:
     parameters:
       coverage-reports:
         default: ""
-        description: Optional comma separated list of coverage reports to send to
-          Codacy
+        description: Optional comma separated list of coverage reports to send to Codacy
         type: string
       project-token:
         default: ${CODACY_PROJECT_TOKEN}
@@ -18,8 +17,7 @@ commands:
         type: string
       skip:
         default: false
-        description: Skip if token isn't defined. Useful to let forks CI pass without
-          passing secrets
+        description: Skip if token isn't defined. Useful to let forks CI pass without passing secrets
         type: boolean
       tool_version:
         default: ""
@@ -29,11 +27,7 @@ commands:
       - run:
           command: |
             export CODACY_REPORTER_VERSION=<< parameters.tool_version >>
-
             export CODACY_PROJECT_TOKEN=<< parameters.project-token >>
-            # comma separated list of report files
-            # reference from https://unix.stackexchange.com/a/191125
-            # plus https://stackoverflow.com/a/20323801/7898052
             report_array=$(printf "<< parameters.coverage-reports >>" | cut -d',' -f1)
 
             params=''
@@ -70,16 +64,10 @@ jobs:
       - image: cimg/python:3.10.2
     steps:
       - checkout
-      - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - python/install-packages:
           pkg-manager: pip
           # app-dir: ~/project/package-directory/  # If you're requirements.txt isn't in the root directory.
           # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
-      - save_cache: # ** special step to save dependency cache **
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
-          paths:
-            - "venv"
       - run:
           name: Run Tests
           command: |
