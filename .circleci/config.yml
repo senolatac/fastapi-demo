@@ -27,12 +27,6 @@ jobs:
             coverage report
             coverage xml
             ls
-      - run:
-          name: Collect test results
-          command: |
-            mkdir -p ~/workdir/codacy/
-            cp coverage.xml ~/workdir/codacy/
-          when: always
       - store_artifacts:
           path: coverage.xml
       - persist_to_workspace:
