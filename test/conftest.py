@@ -7,29 +7,29 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/../../')
+# sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/../../')
 # this is to include backend dir in sys.path so that we can import from db,main.py
-
-from src.route.api import router as api_router
 
 TEST_ENV_VARS = {
     'ENV': 'test'
 }
 
+os.environ["APP_ENV"] = "test"
+
 
 def start_application():
-    app = FastAPI()
-    app.include_router(api_router)
-    return app
+    from app.main import get_application  # local import for testing purpose
+
+    return get_application()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def app() -> Generator[FastAPI, Any, None]:
     _app = start_application()
     yield _app
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def client(
         app: FastAPI
 ) -> Generator[TestClient, Any, None]:
@@ -37,7 +37,7 @@ def client(
         yield client
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture
 def tests_setup_and_teardown():
     # Will be executed before the first test
     old_environ = dict(os.environ)

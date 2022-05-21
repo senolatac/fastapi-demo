@@ -2,12 +2,12 @@ import logging
 
 from fastapi import APIRouter, Depends
 from fastapi import Query
-from src.model.user import UserModel
+from app.model.user import UserModel
 from typing import Optional
 
 # APIRouter creates path operations for user module
-from src.security.role_checker import RoleChecker
-from src.security.security_config import USER
+from app.security.role_checker import RoleChecker
+from app.security.security_config import USER
 
 logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', level=logging.INFO)
 

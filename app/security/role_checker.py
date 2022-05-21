@@ -3,8 +3,8 @@ from typing import List
 
 from fastapi import Depends, HTTPException, status
 
-from src.model.security_user import SecurityUser
-from src.security.security_config import get_current_active_user
+from app.model.security_user import SecurityUser
+from app.security.security_config import get_current_active_user
 
 
 class RoleChecker:

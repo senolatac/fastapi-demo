@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.endpoint import producer, user
+from app.endpoint import producer, user
 
 router = APIRouter()
 router.include_router(user.router)

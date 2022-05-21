@@ -3,10 +3,11 @@ import logging
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from config import settings
-from src.model.security_user import SecurityUser
+from app.core.config import get_app_settings
+from app.model.security_user import SecurityUser
 
 security = HTTPBasic()
+settings = get_app_settings()
 
 SECURE_KEY_TOKEN = settings.secure_key_token
 ADMIN_KEY_TOKEN = settings.admin_key_token
