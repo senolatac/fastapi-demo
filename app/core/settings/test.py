@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Any
 
-from pydantic import PostgresDsn, SecretStr
+from pydantic import SecretStr
 
 from app.core.settings.app import AppSettings
 
@@ -20,6 +20,7 @@ class TestAppSettings(AppSettings):
 
     logging_level: int = logging.DEBUG
 
+    """configuration"""
     class Config(AppSettings.Config):
         env_file = "test.env"
 

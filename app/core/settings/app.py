@@ -1,5 +1,4 @@
 import logging
-import sys
 from typing import Any, Dict
 
 from app.core.settings.base import BaseAppSettings
@@ -16,10 +15,15 @@ class AppSettings(BaseAppSettings):
 
     admin_key_token: str = "admin"
     secure_key_token: str = "user1,user2"
+
     database_url: str = "mysql://admin:1234@localhost:3306/test_db"
+
+    rabbit_host: str = "amqp://guest:guest@localhost/guest"
+    rabbit_example_queue: str = "fastapi_task"
 
     logging_level: int = logging.DEBUG
 
+    """configuration"""
     class Config:
         validate_assignment = True
 
