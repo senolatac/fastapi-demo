@@ -52,4 +52,9 @@ def test_add_user_to_db(authorized_client):
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["email"] == "deadpool@example.com"
-    email = data["email"]
+
+    response = authorized_client.get(f"/users/all-users-from-db")
+
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert len(data) == 1

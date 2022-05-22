@@ -24,6 +24,10 @@ class AppSettings(BaseAppSettings):
         validate_assignment = True
 
     @property
+    def connect_ags(self) -> Dict[str, Any]:
+        return {}
+
+    @property
     def fastapi_kwargs(self) -> Dict[str, Any]:
         return {
             "debug": self.debug,

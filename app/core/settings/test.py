@@ -1,4 +1,5 @@
 import logging
+from typing import Dict, Any
 
 from pydantic import PostgresDsn, SecretStr
 
@@ -21,3 +22,9 @@ class TestAppSettings(AppSettings):
 
     class Config(AppSettings.Config):
         env_file = "test.env"
+
+    @property
+    def connect_ags(self) -> Dict[str, Any]:
+        return {
+            "check_same_thread": False
+        }

@@ -32,4 +32,6 @@ def get_user_by_email(db: Session, email: str):
 def insert_user(db: Session, user: CreateUser):
     db_user = user_db.User(email=user.email, name=user.name, hashed_password=user.hashed_password)
     db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
     return db_user
