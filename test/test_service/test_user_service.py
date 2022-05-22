@@ -7,7 +7,7 @@ from app.service.user_service import get_user
 def test_get_user(mock_get):
     user1 = {
         "id": 2,
-        "username": "testuser",
+        "username": "test-user",
         "email": "testuser@nofoobar.com",
         "password": "testing",
     }
