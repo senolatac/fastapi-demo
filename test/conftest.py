@@ -1,14 +1,12 @@
 import os
-import sys
 from typing import Any
 from typing import Generator
+from base64 import b64encode
 
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-# sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/../../')
-# this is to include backend dir in sys.path so that we can import from db,main.py
 
 TEST_ENV_VARS = {
     'ENV': 'test'
@@ -35,6 +33,16 @@ def client(
 ) -> Generator[TestClient, Any, None]:
     with TestClient(app) as client:
         yield client
+
+
+@pytest.fixture
+def authorized_client(client: TestClient) -> TestClient:
+    auth = b64encode(b"user11:secret").decode("ascii")
+    client.headers = {
+        "Authorization": f"Basic {auth}",
+        **client.headers,
+    }
+    return client
 
 
 @pytest.fixture

@@ -1,1 +1,1 @@
-"""Return the pathname of the root directory."""
+"""Main application package."""

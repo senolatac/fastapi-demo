@@ -16,6 +16,7 @@ class AppSettings(BaseAppSettings):
 
     admin_key_token: str = "admin"
     secure_key_token: str = "user1,user2"
+    database_url: str = "mysql://admin:1234@localhost:3306/test_db"
 
     logging_level: int = logging.DEBUG
 

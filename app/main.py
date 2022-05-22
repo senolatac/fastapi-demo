@@ -4,11 +4,16 @@ from fastapi import FastAPI
 from app.route.api import router as api_router
 import app.queue.listener as listener
 from app.core.config import get_app_settings
+from app.config.db import engine
+from app.config.db import Base
 
 
 def get_application() -> FastAPI:
     settings = get_app_settings()
 
+    Base.metadata.create_all(bind=engine)
+
+    # '**' takes a dict and extracts its contents and passes them as parameters to a function.
     app = FastAPI(**settings.fastapi_kwargs)
 
     app.add_middleware(

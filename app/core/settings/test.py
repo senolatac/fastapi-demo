@@ -13,6 +13,7 @@ class TestAppSettings(AppSettings):
     secret_key: SecretStr = SecretStr("test_secret")
 
     #database_url: PostgresDsn
+    database_url = "sqlite:///:memory:"
     max_connection_count: int = 5
     min_connection_count: int = 5
 
